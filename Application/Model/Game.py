@@ -3,47 +3,37 @@ from PythonWebSocketsGame.Application.Model.Grid import Grid
 from PythonWebSocketsGame.Application.Model.Styles import SelectedStyle
 
 import uuid
-import queue
+
 
 class Game:
 
-    def __init__(self, game_size, players):
+    def __init__(self, lobby):
         self.id = uuid.uuid4()
         self.players = []
-        self.waiting_on = None
         self.players_pointer = 0
         self.active_player = None
         self.winner = None
-        self.assignment_queue = queue.Queue(players)
 
-        for i in range(players):
+        position = 0
 
-            player = Player((i+1))
+        for key, client in lobby.client_in_lobby:
 
-            self.assignment_queue.put(player)
+            player = Player(position+1)
             self.players.append(player)
+            player.style(SelectedStyle(position))
+            player.client = client
+            player.game = self
 
-            player.style(SelectedStyle(i))
-
-            if self.active_player is None:
+            if position == 0:
                 self.active_player = player
 
-        self.grid = Grid(game_size)
-        self.waiting_on = self.number_of_players()
+        position += 1
 
-    def link_client_to_game(self, client):
-
-        if not self.assignment_queue.empty():
-            if not client.in_game:
-                player_to_assign = self.assignment_queue.get()
-                player_to_assign.client = client
-                client.game = self
+        self.grid = Grid(lobby.size_of_game)
 
     def unlink_client_from_game(self, client):
         for player in self.players:
             if player.client.id == client.id:
-                player.client = None
-                client.game = None
                 self.players.remove(player)
                 return player
 
@@ -78,7 +68,7 @@ class Game:
         self.grid.print_board()
 
     def is_game_over(self):
-        return self.has_winner() or self.grid.no_spaces()
+        return self.has_winner() or self.grid.no_spaces() or len(self.players) <= 1
 
     def who_won(self):
         return self.winner
