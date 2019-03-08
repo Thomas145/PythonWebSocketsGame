@@ -3,27 +3,21 @@ from PythonWebSocketsGame.Application.Responses.WsResponse import WsResponse
 from PythonWebSocketsGame.Application.Responses.WsResponse import WsResponseType
 
 
-class WsPlayerExitResponse(WsResponse):
+class WsNewLobbyResponse(WsResponse):
 
-    def __init__(self, player_model_response):
-        super().__init__('player_exit')
-        self.player = player_model_response
+    def __init__(self):
+        super().__init__('server_state')
 
     @staticmethod
     def type_name():
-        return WsResponseType.ws_player_exit.value
+        return WsResponseType.ws_new_lobby.value
 
     @staticmethod
     def encode_complex(complex_object):
-        if isinstance(complex_object, WsPlayerExitResponse):
+        if isinstance(complex_object, WsNewLobbyResponse):
 
             return {
-
                 complex_object.response_action_type(): complex_object.type_name(),
-
-                complex_object.player.type_name():
-                    complex_object.player.encode_complex(complex_object.player)
-
             }
 
         else:

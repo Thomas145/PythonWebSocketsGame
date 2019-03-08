@@ -7,12 +7,12 @@ from PythonWebSocketsGame.Application.Responses.WsResponse import WsResponseType
 class WsGamePlayerTurnResponse(WsResponse):
 
     def __init__(self, player_model_response):
-        super().__init__('game_player_true')
+        super().__init__('player_turn')
         self.player = player_model_response
 
     @staticmethod
     def type_name():
-        return WsResponseType.ws_player_entry_lobby.value
+        return WsResponseType.ws_player_turn.value
 
     @staticmethod
     def encode_complex(complex_object):

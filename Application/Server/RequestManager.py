@@ -40,7 +40,6 @@ class RequestManager:
     async def on_connection_open(self, connection):
         self.CONNECTION_POOL[connection] = WebSocketClient(connection)
         await self.push_server_state_to_all_connections()
-        await self.push_message_to_a_connection(self.messages.make_client_detail_message(connection), connection)
 
     async def on_connection_close(self, connection):
         client = self.CONNECTION_POOL[connection]
@@ -217,7 +216,9 @@ class RequestManager:
         await self.push_message_to_a_connections(message, self.CONNECTION_POOL)
 
     async def push_server_state_to_all_connections(self):
-        await self.push_message_to_all_connections(self.messages.make_server_state_message())
+        number_of_games = self.games.number_of_games()
+        number_of_clients = len(self.CONNECTION_POOL)
+        await self.push_message_to_all_connections(self.messages.make_server_state_message(number_of_clients, number_of_games))
 
     @staticmethod
     async def push_message_to_a_connection(message, connection):

@@ -12,7 +12,7 @@ class WsPlayerExitLobbyResponse(WsResponse):
 
     @staticmethod
     def type_name():
-        return WsResponseType.ws_player_entry_lobby.value
+        return WsResponseType.ws_player_exit_lobby.value
 
     @staticmethod
     def encode_complex(complex_object):
@@ -31,5 +31,3 @@ class WsPlayerExitLobbyResponse(WsResponse):
 
             type_name = complex_object.__class__.__name__
             raise TypeError(f"Object of type '{type_name}' is not JSON serializable")
-
-

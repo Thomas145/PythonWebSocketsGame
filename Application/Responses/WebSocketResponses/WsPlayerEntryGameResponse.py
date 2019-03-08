@@ -4,7 +4,7 @@ from PythonWebSocketsGame.Application.Responses.WsResponse import WsResponse
 from PythonWebSocketsGame.Application.Responses.WsResponse import WsResponseType
 
 
-class WsPlayerEntryResponse(WsResponse):
+class WsPlayerEntryGameResponse(WsResponse):
 
     def __init__(self, player_model_response):
         super().__init__('player_entry')
@@ -12,11 +12,11 @@ class WsPlayerEntryResponse(WsResponse):
 
     @staticmethod
     def type_name():
-        return WsResponseType.ws_player_entry.value
+        return WsResponseType.ws_player_entry_game.value
 
     @staticmethod
     def encode_complex(complex_object):
-        if isinstance(complex_object, WsPlayerEntryResponse):
+        if isinstance(complex_object, WsPlayerEntryGameResponse):
 
             return {
 

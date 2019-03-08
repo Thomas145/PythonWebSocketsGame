@@ -10,7 +10,7 @@ class WsGameDrawResponse(WsResponse):
 
     @staticmethod
     def type_name():
-        return WsResponseType.ws_game_draw_response.value
+        return WsResponseType.ws_game_draw.value
 
     @staticmethod
     def encode_complex(complex_object):
