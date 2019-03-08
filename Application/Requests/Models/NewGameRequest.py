@@ -1,6 +1,4 @@
 
-import json
-
 from PythonWebSocketsGame.Application.Requests.Request import Request
 from PythonWebSocketsGame.Application.Requests.Request import RequestType
 
@@ -25,5 +23,3 @@ class NewGameRequest(Request):
             return new_game_request
 
         return dct
-
-

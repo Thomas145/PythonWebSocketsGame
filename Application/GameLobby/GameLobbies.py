@@ -14,10 +14,10 @@ class GameLobbies:
     def remove_client_from_lobby_index(self, client):
         del self.client_in_lobby_index[client.id]
 
-    def create_new_lobby(self, client):
+    def create_new_lobby(self, number_of_player_required, size_of_game, client):
         new_lobby = None
         if self.is_client_in_lobby(client):
-            new_lobby = GameLobby(client)
+            new_lobby = GameLobby(number_of_player_required, size_of_game, client)
             self.lobbies[new_lobby.lobby_id] = new_lobby
             self.place_client_in_lobby_index(client, new_lobby)
             return new_lobby

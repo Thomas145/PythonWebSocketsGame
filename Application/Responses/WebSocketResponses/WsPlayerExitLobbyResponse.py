@@ -1,31 +1,35 @@
 
+
 from PythonWebSocketsGame.Application.Responses.WsResponse import WsResponse
 from PythonWebSocketsGame.Application.Responses.WsResponse import WsResponseType
 
 
-class WsClientResponse(WsResponse):
+class WsPlayerExitLobbyResponse(WsResponse):
 
-    def __init__(self):
-        super().__init__('client_details')
-        self.client_details = None
+    def __init__(self, player_model_response):
+        super().__init__('player_exit_lobby')
+        self.player = player_model_response
 
     @staticmethod
     def type_name():
-        return WsResponseType.ws_client_details.value
+        return WsResponseType.ws_player_entry_lobby.value
 
     @staticmethod
     def encode_complex(complex_object):
-        if isinstance(complex_object, WsClientResponse):
+        if isinstance(complex_object, WsPlayerExitLobbyResponse):
 
             return {
 
                 complex_object.response_action_type(): complex_object.type_name(),
 
-                complex_object.client_details.type_name():
-                    complex_object.client_details.encode_complex(complex_object.client_details)
+                complex_object.player.type_name():
+                    complex_object.player.encode_complex(complex_object.player)
+
             }
 
         else:
 
             type_name = complex_object.__class__.__name__
             raise TypeError(f"Object of type '{type_name}' is not JSON serializable")
+
+

@@ -1,5 +1,6 @@
 
 from PythonWebSocketsGame.Application.Responses.WsResponse import WsResponse
+from PythonWebSocketsGame.Application.Responses.WsResponse import WsResponseType
 
 
 class WsNewGameResponse(WsResponse):
@@ -11,7 +12,7 @@ class WsNewGameResponse(WsResponse):
 
     @staticmethod
     def type_name():
-        return 'ws_new_game'
+        return WsResponseType.ws_new_game.value
 
     @staticmethod
     def encode_complex(complex_object):
@@ -31,4 +32,3 @@ class WsNewGameResponse(WsResponse):
 
             type_name = complex_object.__class__.__name__
             raise TypeError(f"Object of type '{type_name}' is not JSON serializable")
-

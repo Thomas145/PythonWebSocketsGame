@@ -3,26 +3,22 @@ from PythonWebSocketsGame.Application.Responses.WsResponse import WsResponse
 from PythonWebSocketsGame.Application.Responses.WsResponse import WsResponseType
 
 
-class WsClientResponse(WsResponse):
+class WsActionFailureResponse(WsResponse):
 
     def __init__(self):
-        super().__init__('client_details')
-        self.client_details = None
+        super().__init__('your_turn')
 
     @staticmethod
     def type_name():
-        return WsResponseType.ws_client_details.value
+        return WsResponseType.ws_action_failure.value
 
     @staticmethod
     def encode_complex(complex_object):
-        if isinstance(complex_object, WsClientResponse):
+
+        if isinstance(complex_object, WsActionFailureResponse):
 
             return {
-
                 complex_object.response_action_type(): complex_object.type_name(),
-
-                complex_object.client_details.type_name():
-                    complex_object.client_details.encode_complex(complex_object.client_details)
             }
 
         else:

@@ -1,5 +1,4 @@
 
-
 import json
 
 from abc import abstractmethod
@@ -18,4 +17,8 @@ class Request(json.JSONDecoder):
 
 
 class RequestType(Enum):
-    new_game = 'new_game'
+    new_game = 'new_game',
+    exit_lobby = 'exit_lobby',
+    join_game = 'join_game',
+    exit_game = 'exit_game',
+    select_area = 'select_area',

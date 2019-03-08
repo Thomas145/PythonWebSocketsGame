@@ -76,6 +76,16 @@ class Game:
     def who_turn_is_it(self):
         return self.active_player
 
+    def select_area(self, client, grid_position):
+
+        if self.active_player is not None:
+
+            if self.active_player.client.id == client.id:
+
+                return self.active_player_mark_space(grid_position.grid_row, grid_position.grid_column)
+
+        return False
+
     def active_player_mark_space(self, grid_row, grid_column):
 
         grid_selection = self.grid.exact_position(grid_row, grid_column)
@@ -90,3 +100,7 @@ class Game:
                     self.swap_active_player()
                 else:
                     self.winner = self.active_player
+
+            return True
+
+        return False

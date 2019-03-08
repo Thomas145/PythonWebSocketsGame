@@ -42,7 +42,6 @@ async def counter(websocket, path):
         async for message in websocket:
             await request_manager.on_message(message, websocket)
 
-
     except Exception:
         print("Exception in user code:")
         print("-"*60)

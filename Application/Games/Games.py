@@ -7,6 +7,15 @@ class Games:
     def __init__(self):
         self.games = dict()
 
+    def select_area(self, client, grid_position):
+        game = self.games[client.client.game.id]
+
+        if game is not None:
+            if game.select_area(client, grid_position):
+                return game
+
+        return None
+
     def make_new_make_from_lobby(self, lobby):
         game = Game(lobby)
         self.games[game.id] = game
