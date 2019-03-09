@@ -6,8 +6,10 @@ class GridAreaModelResponse(Response):
 
     def __init__(self):
         super().__init__()
-        self.style = None
-        self.grid_reference = None
+        self.content = None
+        self.selected = None
+        self.grid_row = None
+        self.grid_column = None
 
     @staticmethod
     def type_name():

@@ -3,21 +3,21 @@
 from PythonWebSocketsGame.Application.Responses.Response import Response
 
 
-class StyleModelResponse(Response):
+class GridRowsModelResponse(Response):
 
-    def __init__(self):
-        super().__init__()
-        self.display = None
-        self.available = False
+    def __init__(self, columns):
+        self.columns = columns
 
     @staticmethod
     def type_name():
-        return 'style_state'
+        return 'grid_row'
 
     @staticmethod
     def encode_complex(complex_object):
-        if isinstance(complex_object, StyleModelResponse):
-            return complex_object.__dict__
+        if isinstance(complex_object, GridRowsModelResponse):
+
+            return [grid_model.encode_complex(grid_model) for grid_model in complex_object.columns]
+
         else:
             type_name = complex_object.__class__.__name__
             raise TypeError(f"Object of type '{type_name}' is not JSON serializable")

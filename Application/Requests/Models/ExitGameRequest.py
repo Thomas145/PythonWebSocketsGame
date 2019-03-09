@@ -6,13 +6,15 @@ from PythonWebSocketsGame.Application.Requests.Request import RequestType
 
 class ExitGameRequest(Request):
 
-    def __init__(self, *args, **kwargs):
-        Request.__init__(self, *args, **kwargs)
+    def __init__(self):
+        Request.__init__(self, RequestType.exit_game)
 
-    @staticmethod
-    def object_hook(dct):
+    def decode_dct(self, dct):
 
-        if 'request' in dct and RequestType.exit_game.value == dct['request']:
-            return ExitGameRequest()
+        if self.request_of_type(dct):
 
-        return dct
+            exit_game_request = ExitGameRequest()
+
+            return exit_game_request
+
+        raise TypeError(f"'{self.__class__.__name__}' could not be decoded")

@@ -24,6 +24,7 @@ class GameLobby:
         return False
 
     def leave_game_lobby(self, client):
+        print("Started leave_game_lobby")
         del self.clients_in_lobby[client.id]
 
     def active_lobby_connections(self):
@@ -34,4 +35,11 @@ class GameLobby:
 
         return connections
 
+    def number_of_players_required(self):
+        return self.number_of_player_required
 
+    def awaiting_number_of_players(self):
+        return self.number_of_player_required - len(self.clients_in_lobby)
+
+    def get_clients_in_lobby(self):
+        return self.clients_in_lobby

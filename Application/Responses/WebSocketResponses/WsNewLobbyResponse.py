@@ -5,8 +5,9 @@ from PythonWebSocketsGame.Application.Responses.WsResponse import WsResponseType
 
 class WsNewLobbyResponse(WsResponse):
 
-    def __init__(self):
-        super().__init__('server_state')
+    def __init__(self, lobby_model):
+        super().__init__('lobby_state')
+        self.lobby = lobby_model
 
     @staticmethod
     def type_name():
@@ -18,6 +19,7 @@ class WsNewLobbyResponse(WsResponse):
 
             return {
                 complex_object.response_action_type(): complex_object.type_name(),
+                complex_object.lobby.type_name(): complex_object.lobby.encode_complex(complex_object.lobby)
             }
 
         else:

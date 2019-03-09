@@ -8,7 +8,7 @@ class NoStyle:
         self.id = uuid.uuid4()
 
     def display(self):
-        return "*"
+        return ""
 
     def selected(self):
         return False

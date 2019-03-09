@@ -1,19 +1,22 @@
 
-import json
-
 from abc import abstractmethod
 from enum import Enum
 
 
-class Request(json.JSONDecoder):
+class Request:
+    def __init__(self, request):
+        self.request = request.value[0]
 
-    def __init__(self, *args, **kwargs):
-        json.JSONDecoder.__init__(self, object_hook=self.object_hook, *args, **kwargs)
-
-    @staticmethod
     @abstractmethod
-    def object_hook(dct):
+    def decode_dct(self, dct):
         pass
+
+    def request_of_type(self, dct):
+        r = 'request' in dct
+        s = self.request == dct['request']
+        if r and s:
+            return True
+        return False
 
 
 class RequestType(Enum):
@@ -22,3 +25,15 @@ class RequestType(Enum):
     join_game = 'join_game',
     exit_game = 'exit_game',
     select_area = 'select_area',
+    select_area1 = 1
+
+    @staticmethod
+    def from_str(label):
+
+        for r_type in RequestType:
+
+            if label == r_type.name:
+
+                return r_type
+
+        raise NotImplementedError

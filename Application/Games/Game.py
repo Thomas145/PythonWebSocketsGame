@@ -13,10 +13,10 @@ class Game:
         self.players_pointer = 0
         self.active_player = None
         self.winner = None
+        self.grid = Grid(lobby.size_of_game)
 
         position = 0
-
-        for key, client in lobby.client_in_lobby:
+        for key, client in lobby.get_clients_in_lobby().items():
 
             player = Player(position+1)
             self.players.append(player)
@@ -26,15 +26,14 @@ class Game:
 
             if position == 0:
                 self.active_player = player
-
-        position += 1
-
-        self.grid = Grid(lobby.size_of_game)
+            position += 1
 
     def unlink_client_from_game(self, client):
+        print('Stared unlink_client_from_game')
         for player in self.players:
             if player.client.id == client.id:
                 self.players.remove(player)
+                print('unlink_client_from_game_removed')
                 return player
 
         return None

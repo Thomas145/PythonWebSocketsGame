@@ -5,16 +5,14 @@ from PythonWebSocketsGame.Application.Requests.Request import RequestType
 
 class NewGameRequest(Request):
 
-    def __init__(self, *args, **kwargs):
-        Request.__init__(self, *args, **kwargs)
-
+    def __init__(self):
+        Request.__init__(self, RequestType.new_game)
         self.number_of_players = None
         self.size_of_game = None
 
-    @staticmethod
-    def object_hook(dct):
+    def decode_dct(self, dct):
 
-        if 'request' in dct and RequestType.new_game.value == dct['request']:
+        if self.request_of_type(dct):
 
             new_game_request = NewGameRequest()
             new_game_request.number_of_players = int(dct['number_of_players'])
@@ -22,4 +20,4 @@ class NewGameRequest(Request):
 
             return new_game_request
 
-        return dct
+        raise TypeError(f"'{self.__class__.__name__}' could not be decoded")

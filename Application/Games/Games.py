@@ -1,5 +1,5 @@
 
-from PythonWebSocketsGame.Application.Model.Game import Game
+from PythonWebSocketsGame.Application.Games.Game import Game
 
 
 class Games:
@@ -28,10 +28,13 @@ class Games:
             return False
 
     def player_exits_game(self, client):
+        print('Started player_exits_game')
         game = None
         if client.game is not None:
-            game = self.games[client.game.id]
+            print('player_was_in_game')
+            game = self.games.get(client.game.id)
             if game is not None:
+                print('player_was_in_game_found')
                 game.unlink_client_from_game(client)
 
         return game

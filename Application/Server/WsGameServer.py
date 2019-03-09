@@ -19,12 +19,12 @@ STATE = {'value': 0}
 
 async def register(websocket):
     print("Server:  register")
-    await request_manager.add_to_connection_pool(websocket)
+    await request_manager.on_connection_open(websocket)
 
 
 async def unregister(websocket):
     print("Server: unregister")
-    await request_manager.remove_from_connection_pool(websocket)
+    await request_manager.on_connection_close(websocket)
 
 
 async def counter(websocket, path):

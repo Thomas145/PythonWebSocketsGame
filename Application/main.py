@@ -1,4 +1,4 @@
-from PythonWebSocketsGame.Application.Model.Game import Game
+from PythonWebSocketsGame.Application.Games.Game import Game
 
 
 def main():

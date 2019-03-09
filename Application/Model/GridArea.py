@@ -16,6 +16,9 @@ class GridArea:
     def grid_area_style(self):
         return self.style
 
+    def grid_area_position(self):
+        return self.position
+
     def open(self):
         return not self.style.selected()
 

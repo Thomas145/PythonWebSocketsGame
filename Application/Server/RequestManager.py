@@ -7,22 +7,19 @@ from PythonWebSocketsGame.Application.Games.Games import Games
 # Requests Models
 from PythonWebSocketsGame.Application.Requests.Request import RequestType
 
-# Ws Server Requests
-from PythonWebSocketsGame.Application.Requests.Models.ExitGameRequest import ExitGameRequest
-from PythonWebSocketsGame.Application.Requests.Models.ExitLobbyRequest import ExitLobbyRequest
-from PythonWebSocketsGame.Application.Requests.Models.JoinGameRequest import JoinGameRequest
-from PythonWebSocketsGame.Application.Requests.Models.NewGameRequest import NewGameRequest
-from PythonWebSocketsGame.Application.Requests.Models.SelectGridAreaMessage import SelectGridAreaMessage
-
 
 # Ws Server Wrappers
 from PythonWebSocketsGame.Application.Server.Model.WebSocketClient import WebSocketClient
-from PythonWebSocketsGame.Application.Server.WsGameMessages import WsGameMessages
+
+from PythonWebSocketsGame.Application.Server.WsGameResponseMessages import WsGameResponseMessages
+
+from PythonWebSocketsGame.Application.Server.WsGameRequestMessages import WsGameRequestMessages
 
 
 class RequestManager:
 
-    messages = WsGameMessages()
+    messages = WsGameResponseMessages()
+    requests = WsGameRequestMessages()
     lobbies = GameLobbies()
     games = Games()
 
@@ -38,10 +35,12 @@ class RequestManager:
         }
 
     async def on_connection_open(self, connection):
+        print('on_connection_open')
         self.CONNECTION_POOL[connection] = WebSocketClient(connection)
         await self.push_server_state_to_all_connections()
 
     async def on_connection_close(self, connection):
+        print('on_connection_close')
         client = self.CONNECTION_POOL[connection]
         game = self.games.player_exits_game(client)
         lobby = self.lobbies.leave_lobby(client)
@@ -66,10 +65,9 @@ class RequestManager:
 
         await self.push_server_state_to_all_connections()
 
-    async def on_join_game_message(self, message, connection):
-
+    async def on_join_game_message(self, json_as_dct, connection):
         client = self.CONNECTION_POOL[connection]
-        join_game_request = json.load(message, cls=JoinGameRequest)
+        join_game_request = self.requests.unwrap_join_game_request(json_as_dct)
 
         if join_game_request is not None:
 
@@ -84,14 +82,21 @@ class RequestManager:
                     self.messages.make_player_lobby_entry_message(client), active_connections)
 
                 await self.push_message_to_a_connections(
-                    self.messages.make_you_have_joined_lobby_message(client), client.connection)
+                    self.messages.make_you_have_joined_lobby_message(), client.connection)
+
+            else:
+
+                await self.push_message_to_a_connection(self.messages.make_action_failure_message(), client.connection)
+
         else:
 
             await self.push_message_to_a_connection(self.messages.make_action_failure_message(), client.connection)
 
-    async def on_create_game_message(self, message, connection):
+    async def on_create_game_message(self, json_as_dct, connection):
+        print("Started on_create_game_message")
+
         client = self.CONNECTION_POOL[connection]
-        new_game_request = json.load(message, cls=NewGameRequest)
+        new_game_request = self.requests.unwrap_new_game_request(json_as_dct)
 
         if new_game_request is not None:
 
@@ -99,18 +104,22 @@ class RequestManager:
                 new_game_request.number_of_players, new_game_request.size_of_game, client)
 
             if new_lobby is not None:
-                await self.push_message_to_a_connection(self.messages.make_new_lobby_message(new_lobby), client.connection)
-            else:
-                await self.push_message_to_a_connection(self.messages.make_action_failure_message(), client.connection)
 
+                await self.push_message_to_a_connection(
+                    self.messages.make_new_lobby_message(new_lobby), client.connection)
+            else:
+
+                await self.push_message_to_a_connection(self.messages.make_action_failure_message(), client.connection)
         else:
 
             await self.push_message_to_a_connection(self.messages.make_action_failure_message(), client.connection)
 
-    async def on_lobby_exit_message(self, message, connection):
+        print("Ended on_create_game_message")
+
+    async def on_lobby_exit_message(self, json_as_dct, connection):
 
         client = self.CONNECTION_POOL[connection]
-        exit_lobby_request = json.load(message, cls=ExitLobbyRequest)
+        exit_lobby_request = self.requests.unwrap_exit_lobby_request(json_as_dct)
 
         if exit_lobby_request is not None:
 
@@ -134,10 +143,10 @@ class RequestManager:
 
             await self.push_message_to_a_connection(self.messages.make_action_failure_message(), client.connection)
 
-    async def on_game_exit_message(self, message, connection):
+    async def on_game_exit_message(self, json_as_dct, connection):
 
         client = self.CONNECTION_POOL[connection]
-        exit_game_request = json.load(message, cls=ExitGameRequest)
+        exit_game_request = self.requests.unwrap_exit_game_request(json_as_dct)
 
         if exit_game_request is not None:
 
@@ -165,13 +174,14 @@ class RequestManager:
 
             await self.push_message_to_a_connection(self.messages.make_action_failure_message(), client.connection)
 
-    async def on_grid_area_selection_message(self, message, connection):
+    async def on_grid_area_selection_message(self, json_as_dct, connection):
+
         client = self.CONNECTION_POOL[connection]
-        select_grid_area = json.loads(message, cls=SelectGridAreaMessage)
+        select_area_request = self.requests.unwrap_select_area_request(json_as_dct)
 
-        if select_grid_area is not None:
+        if select_area_request is not None:
 
-            game = self.games.select_area(client, select_grid_area)
+            game = self.games.select_area(client, select_area_request)
 
             if game is not None:
 
@@ -203,28 +213,43 @@ class RequestManager:
                 self.messages.make_action_failure_message(), client.connection)
 
     async def on_message(self, message, active_connection):
-        data = json.loads(message)
-        request_action = RequestType(data['request'])
-        action = self.request_types[request_action]
+        print("Started: on_message")
+        json_as_dct = json.loads(message)
 
-        request_function = action[0]
-        response_function = action[1]
-        request_result = request_function(message, active_connection)
-        await response_function(request_result, active_connection)
+        try:
+
+            request_type = json_as_dct['request']
+            print("Started: on_message: request_type " + request_type)
+            request_action = RequestType.from_str(request_type)
+
+            action = self.request_types[request_action]
+
+            await action(json_as_dct, active_connection)
+        except NotImplementedError:
+            await self.push_message_to_a_connection(
+                self.messages.make_action_failure_message(), active_connection)
+
+        print("Ended: on_message")
 
     async def push_message_to_all_connections(self, message):
         await self.push_message_to_a_connections(message, self.CONNECTION_POOL)
 
     async def push_server_state_to_all_connections(self):
+
         number_of_games = self.games.number_of_games()
+
         number_of_clients = len(self.CONNECTION_POOL)
-        await self.push_message_to_all_connections(self.messages.make_server_state_message(number_of_clients, number_of_games))
+
+        await self.push_message_to_all_connections(
+            self.messages.make_server_state_message(number_of_clients, number_of_games))
 
     @staticmethod
     async def push_message_to_a_connection(message, connection):
+        print("push_message_to_a_connection: " + message)
         await asyncio.wait([connection.send(message)])
 
     @staticmethod
     async def push_message_to_a_connections(message, connections):
+        print("push_message_to_a_connections: " + message)
         if connections:  # asyncio.wait doesn't accept an empty list
             await asyncio.wait([connection.send(message) for connection in connections])

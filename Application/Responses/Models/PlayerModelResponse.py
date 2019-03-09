@@ -9,14 +9,9 @@ class PlayerModelResponse(Response):
         super().__init__()
         self.player_name = None
 
-    def from_player(self, player):
-        self.player_name = player.get_player_name()
-        return self
-
-
     @staticmethod
     def type_name():
-        return 'player_state'
+        return 'player'
 
     @staticmethod
     def encode_complex(complex_object):

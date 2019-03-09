@@ -6,8 +6,10 @@ from PythonWebSocketsGame.Application.Responses.WsResponse import WsResponseType
 
 class WsGameStateResponse(WsResponse):
 
-    def __init__(self):
+    def __init__(self, players, grid):
         super().__init__('game_state')
+        self.players = players
+        self.grid = grid
 
     @staticmethod
     def type_name():
@@ -18,7 +20,16 @@ class WsGameStateResponse(WsResponse):
         if isinstance(complex_object, WsGameStateResponse):
 
             return {
-                complex_object.response_action_type(): complex_object.type_name()
+
+                complex_object.response_action_type():
+                    complex_object.type_name(),
+
+                complex_object.players.type_name():
+                    complex_object.players.encode_complex(complex_object.players),
+
+                complex_object.grid.type_name():
+                    complex_object.grid.encode_complex(complex_object.grid)
+
             }
 
         else:

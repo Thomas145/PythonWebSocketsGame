@@ -10,7 +10,7 @@ async def hello(uri):
         greeting = await websocket.recv()
         print("Client: " + greeting)
 
-        await websocket.send(json.dumps({'action': 'minus'}))
+
         message = await websocket.recv()
         print("client: message " + message)
 

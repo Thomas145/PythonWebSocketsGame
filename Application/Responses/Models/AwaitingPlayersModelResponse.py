@@ -7,15 +7,10 @@ class AwaitingPlayersModelResponse(Response):
     def __init__(self):
         super().__init__()
         self.awaiting_players = None
-        self.players_remaining = None
-
-    def waiting_on(self, registered_players, players_required):
-        self.players_remaining = registered_players - players_required
-        self.awaiting_players = self.players_remaining > 0
 
     @staticmethod
     def type_name():
-        return 'awaiting_players'
+        return 'awaiting'
 
     @staticmethod
     def encode_complex(complex_object):
