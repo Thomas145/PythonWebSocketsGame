@@ -22,6 +22,8 @@ from PythonWebSocketsGame.Application.Responses.Models.GridAreaModelResponse imp
 
 from PythonWebSocketsGame.Application.Responses.WebSocketResponses.WsServerStateResponse import WsServerStateResponse
 
+from PythonWebSocketsGame.Application.Responses.WebSocketResponses.WsGameStartResponse import WsGameStartResponse
+
 from PythonWebSocketsGame.Application.Responses.WebSocketResponses.WsPlayerVictoryResponse \
     import WsPlayerVictoryResponse
 
@@ -252,4 +254,10 @@ class WsGameResponseMessages:
         player_response = self.make_player_model_response(client)
         ws_player_enter_lobby_response = WsPlayerEnterLobbyResponse(player_response)
         _json = json.dumps(ws_player_enter_lobby_response, default=WsPlayerEnterLobbyResponse.encode_complex)
+        return _json
+
+    @staticmethod
+    def make_game_start_message():
+        ws_game_start = WsGameStartResponse()
+        _json = json.dumps(ws_game_start, default=WsGameStartResponse.encode_complex)
         return _json

@@ -22,7 +22,9 @@ class Game:
             self.players.append(player)
             player.style(SelectedStyle(position))
             player.client = client
-            player.game = self
+
+            # Links the client to the game on creation so on any action the game can be found with ease.
+            client.game = self
 
             if position == 0:
                 self.active_player = player

@@ -30,8 +30,8 @@ class GameLobby:
     def active_lobby_connections(self):
         connections = set()
 
-        for key, value in self.clients_in_lobby:
-            connections.add(value.connection)
+        for key, client in self.clients_in_lobby.items():
+            connections.add(client.connection)
 
         return connections
 

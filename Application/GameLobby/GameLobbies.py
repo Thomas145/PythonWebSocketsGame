@@ -37,7 +37,7 @@ class GameLobbies:
     def join_lobby(self, client):
         if not self.is_client_in_lobby(client):
 
-            for lobby_id, lobby in self.lobbies:
+            for lobby in self.lobbies.values():
 
                 if lobby.join_game_lobby(client):
 
@@ -46,6 +46,11 @@ class GameLobbies:
                     return lobby
 
         return None
+
+    def lobby_game_started(self, lobby):
+        print("Stared lobby_game_started")
+        for value in lobby.get_clients_in_lobby().copy().values():
+            self.leave_lobby(value)
 
     def leave_lobby(self, client):
         print("Stared leave_lobby")

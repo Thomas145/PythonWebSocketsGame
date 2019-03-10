@@ -48,10 +48,11 @@ class RequestManager:
 
         if game is not None:
 
-            if game.is_game_over():
+            game_connections = game.get_active_connections()
 
-                await self.push_message_to_a_connections(
-                    self.messages.make_game_over_message(), game.get_active_connections())
+            if self.games.is_game_over(game):
+
+                await self.push_message_to_a_connections(self.messages.make_game_over_message(), game_connections)
 
             else:
 
@@ -81,8 +82,24 @@ class RequestManager:
                 await self.push_message_to_a_connections(
                     self.messages.make_player_lobby_entry_message(client), active_connections)
 
-                await self.push_message_to_a_connections(
+                await self.push_message_to_a_connection(
                     self.messages.make_you_have_joined_lobby_message(), client.connection)
+
+                if lobby.is_lobby_full():
+
+                    new_game = self.games.make_game_from_lobby(lobby)
+                    self.lobbies.lobby_game_started(lobby)
+
+                    game_connections = new_game.get_active_connections()
+
+                    await self.push_message_to_a_connections(
+                       self.messages.make_game_start_message(), game_connections)
+
+                    await self.push_message_to_a_connections(
+                       self.messages.make_game_state_message(new_game), game_connections)
+
+                    await self.push_message_to_a_connection(
+                       self.messages.make_your_turn_message(), new_game.who_turn_is_it().client.connection)
 
             else:
 
@@ -107,9 +124,11 @@ class RequestManager:
 
                 await self.push_message_to_a_connection(
                     self.messages.make_new_lobby_message(new_lobby), client.connection)
+
             else:
 
                 await self.push_message_to_a_connection(self.messages.make_action_failure_message(), client.connection)
+
         else:
 
             await self.push_message_to_a_connection(self.messages.make_action_failure_message(), client.connection)
@@ -154,7 +173,7 @@ class RequestManager:
 
             if game is not None:
 
-                if game.is_game_over():
+                if self.games.is_game_over(game):
 
                     await self.push_message_to_a_connections(
                         self.messages.make_game_over_message(), game.get_active_connections())
@@ -185,22 +204,40 @@ class RequestManager:
 
             if game is not None:
 
+                active_connections = game.get_active_connections()
+
                 await self.push_message_to_a_connection(
                     self.messages.make_you_have_selected_area_game_message(), client.connection)
-
-                active_connections = game.get_active_connections()
-                active_player = game.who_turn_is_it()
 
                 await self.push_message_to_a_connections(
                     self.messages.make_game_state_message(game), active_connections)
 
-                await self.push_message_to_a_connection(
-                    self.messages.make_your_turn_message(), active_player.client.connection)
+                if self.games.is_game_over(game):
 
-                active_connections.remove(active_player.client.connection)
+                    winner = game.who_won()
 
-                await self.push_message_to_a_connections(
-                    self.messages.make_player_turn_message(active_player), active_connections)
+                    if winner is None:
+
+                        await self.push_message_to_a_connections(
+                            self.messages.make_game_draw_message(), active_connections)
+
+                    else:
+
+                        await self.push_message_to_a_connections(
+                            self.messages.make_player_victory_message(winner.client), active_connections)
+
+                else:
+
+                    active_player = game.who_turn_is_it()
+                    active_player_connection = active_player.client.connection
+
+                    await self.push_message_to_a_connection(
+                        self.messages.make_your_turn_message(), active_player_connection)
+
+                    active_connections.remove(active_player_connection)
+
+                    await self.push_message_to_a_connections(
+                        self.messages.make_player_turn_message(active_player), active_connections)
 
             else:
 

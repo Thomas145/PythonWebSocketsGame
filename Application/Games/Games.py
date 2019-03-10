@@ -16,9 +16,10 @@ class Games:
 
         return None
 
-    def make_new_make_from_lobby(self, lobby):
+    def make_game_from_lobby(self, lobby):
         game = Game(lobby)
         self.games[game.id] = game
+        return game
 
     def check_if_game_over(self, game_id):
         game = self.games[game_id]
@@ -36,8 +37,19 @@ class Games:
             if game is not None:
                 print('player_was_in_game_found')
                 game.unlink_client_from_game(client)
+        else:
+            print("Client was not in game")
 
         return game
+
+    def is_game_over(self, game):
+        print("is_game_over")
+        if self.check_if_game_over(game.id):
+            print("game_is_over terminating game")
+            del self.games[game.id]
+            return True
+        print("game_is_not_over")
+        return False
 
     def number_of_games(self):
         return len(self.games)

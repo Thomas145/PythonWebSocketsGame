@@ -12,18 +12,42 @@ from PythonWebSocketsGame.Application.Requests.Models.ExitLobbyRequest import Ex
 from PythonWebSocketsGame.Application.Requests.Models.ExitGameRequest import ExitGameRequest
 from PythonWebSocketsGame.Application.Requests.Models.SelectAreaRequest import SelectAreaRequest
 
+import time
+
 url = 'ws://localhost:8765'
 
 
+async def get_message(websocket):
+
+    try:
+        while True:
+            message = await asyncio.wait_for(websocket.recv(), timeout=1)
+            print(message)
+    except Exception:
+        print("No more messages")
+
+
 class TestClient:
+
+    async def test_join_game(self, uri):
+
+        async with websockets.connect(uri) as websocket:
+
+            await get_message(websocket)
+
+            join_game_request = JoinGameRequest()
+            await websocket.send(json.dumps(join_game_request.__dict__))
+
+            await get_message(websocket)
+
+            websocket.close()
 
     @staticmethod
     async def test_handshake(uri):
 
         async with websockets.connect(uri) as websocket:
 
-            message = await websocket.recv()
-            print("1#" + message)
+            await get_message(websocket)
 
             websocket.close()
 
@@ -32,8 +56,7 @@ class TestClient:
 
         async with websockets.connect(uri) as websocket:
 
-            message = await websocket.recv()
-            print("1#" + message)
+            await get_message(websocket)
 
             new_game_request = NewGameRequest()
             new_game_request.number_of_players = 2
@@ -41,11 +64,11 @@ class TestClient:
 
             await websocket.send(json.dumps(new_game_request.__dict__))
 
-            message = await websocket.recv()
-            print("2#" + message)
+            await get_message(websocket)
 
-            message = await websocket.recv()
-            print("3#" + message)
+            await TestClient().test_join_game(uri)
+
+            await get_message(websocket)
 
             websocket.close()
 
@@ -53,6 +76,7 @@ class TestClient:
 functions_list = [o for o in getmembers(TestClient()) if isfunction(o[1])]
 
 print('STARTED')
+
 for f in functions_list:
     print('---------------------------')
     print(f[0])

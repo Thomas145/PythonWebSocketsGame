@@ -28,6 +28,7 @@ class WsResponseType(Enum):
     ws_new_game = 'ws_new_game',
     ws_new_lobby = 'ws_new_lobby',
 
+    ws_game_start = 'ws_game_start',
     ws_game_draw = 'ws_game_draw',
     ws_game_over = 'ws_game_over',
     ws_game_state = 'ws_game_state',
